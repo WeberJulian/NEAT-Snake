@@ -1,13 +1,9 @@
 const s = p => {
   const cellSize = 40;
   const gridSize = 10;
-  const dashBordWidth = 400;
   const timeStep = 100;
   const margin = 5;
   let score = 0;
-  let scores = [];
-  let plotData = [];
-  let step = 0;
   let canChangeDirection = true;
   let tick = 0;
 
@@ -46,7 +42,7 @@ const s = p => {
       this.alive = true;
       this.gridSize = gridSize;
       this.food = new Food();
-      this.food.reset(this.body)
+      this.food.reset(this.body);
     }
 
     move() {
@@ -71,7 +67,7 @@ const s = p => {
         }
       }
       if (this.body[0].x == this.food.x && this.body[0].y == this.food.y) {
-        this.food.reset(this.body)
+        this.food.reset(this.body);
         score += 1;
       } else {
         this.body.pop();
@@ -82,22 +78,14 @@ const s = p => {
   let snake = new Snake(gridSize);
 
   p.setup = () => {
-    p.createCanvas(gridSize * cellSize + dashBordWidth, gridSize * cellSize);
+    p.createCanvas(gridSize * cellSize, gridSize * cellSize);
     tick = p.millis();
   };
 
   p.draw = () => {
     p.noStroke();
     if (!snake.alive) {
-      p.background(0);
-      p.fill(200);
-      p.textSize(35);
-      p.textAlign(p.CENTER);
-      p.text(
-        "GAME OVER",
-        Math.ceil((gridSize * cellSize) / 2),
-        Math.ceil((gridSize * cellSize) / 2)
-      );
+      drawGameOver();
     } else if (tick + timeStep <= p.millis()) {
       canChangeDirection = true;
       p.background(75);
@@ -107,19 +95,35 @@ const s = p => {
       drawFood();
       drawScore();
     }
-    drawDashBoard();
   };
 
-  function drawScore(){
+  function drawGameOver() {
+    p.background(0);
+    p.fill(200);
+    p.textSize(35);
+    p.textAlign(p.CENTER);
+    p.text(
+      "GAME OVER",
+      Math.ceil((gridSize * cellSize) / 2),
+      Math.ceil((gridSize * cellSize) / 2)
+    );
+  }
+
+  function drawScore() {
     p.fill(255);
     p.textSize(15);
     p.textAlign(p.LEFT);
     p.text("Score : " + score, margin, margin * 3);
   }
 
-  function drawFood(){
+  function drawFood() {
     p.fill(p.color(255, 0, 0));
-    p.rect(snake.food.x * cellSize, snake.food.y * cellSize, cellSize, cellSize);
+    p.rect(
+      snake.food.x * cellSize,
+      snake.food.y * cellSize,
+      cellSize,
+      cellSize
+    );
   }
 
   function drawSnake() {
@@ -132,22 +136,6 @@ const s = p => {
         cellSize
       );
     }
-  }
-
-  function drawDashBoard() {
-    p.fill(255);
-    p.rect(gridSize * cellSize, 0, dashBordWidth, gridSize * cellSize);
-    var plot = new GPlot(
-      p,
-      gridSize * cellSize,
-      0,
-      dashBordWidth,
-      gridSize * cellSize
-    );
-    plot.setPoints(plotData);
-    plot.getXAxis().setAxisLabelText("Steps");
-    plot.getYAxis().setAxisLabelText("Score");
-    plot.defaultDraw();
   }
 
   p.keyPressed = () => {
@@ -168,8 +156,6 @@ const s = p => {
     }
     if (p.key === "r") {
       snake = new Snake(gridSize);
-      scores.push(score);
-      plotData.push(new GPoint(step, score));
       score = 0;
       step += 1;
     }
